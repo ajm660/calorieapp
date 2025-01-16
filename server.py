@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 import tempfile
+import os
 
 from calorie_counter import get_calories_from_image
 
@@ -17,12 +18,12 @@ def upload():
         return {
             "error": "No image uploaded",
         }, 400
-
-    temp_file = tempfile.NamedTemporaryFile()
-    image.save(temp_file.name)
-
-    calories = get_calories_from_image(temp_file.name)
-    temp_file.close()
+    
+    with tempfile.NamedTemporaryFile(delete=False, dir=os.path.expanduser('~')) as temp_file:
+    ## temp_file = tempfile.NamedTemporaryFile()
+        image.save(temp_file.name)
+        calories = get_calories_from_image(temp_file.name)
+        temp_file.close()
 
     return {
         "calories": calories,
